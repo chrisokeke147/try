@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TRY — Tricycle rides in Onitsha, on demand</title>
+  <meta name="description" content="TRY is a tricycle (Keke) ride-hailing app launching first in Onitsha. Verified drivers, fair pricing, wallet or cash. Join the early-access waitlist." />
+  <link rel="icon" href="assets/favicon.png" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="brand">
+        <img src="assets/logo-mark-white.png" alt="TRY" />
+        TRY
+      </a>
+      <nav class="site-nav">
+        <a href="#how-it-works">How it works</a>
+        <a href="#drivers">For Drivers</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a href="#waitlist" class="btn btn-primary" style="padding: 10px 20px; font-size: 14px;">Join waitlist</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <span class="eyebrow">Launching first in Onitsha</span>
+      <h1>Your Keke,<br /><span class="accent">a few taps away.</span></h1>
+      <p class="subhead">
+        TRY connects you with verified tricycle drivers nearby — see their photo and
+        plate number before they arrive, pay by wallet or cash, and get moving.
+      </p>
+      <div class="hero-ctas">
+        <button class="btn btn-primary" onclick="selectRole('rider')">I want to ride</button>
+        <button class="btn btn-outline" onclick="selectRole('driver')">I want to drive</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works">
+    <div class="container">
+      <div class="section-head">
+        <h2>How TRY works</h2>
+        <p>Three steps, no haggling over fare at the roadside.</p>
+      </div>
+      <div class="grid-3">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Request a ride</h3>
+          <p>Drop your pickup and destination. We show you the fare upfront, before you book.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Get matched</h3>
+          <p>The nearest available driver accepts. You see their photo, name, and plate number instantly.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Ride & pay</h3>
+          <p>Track your Keke approaching, take your trip, and pay by TRY wallet or cash — your choice.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt">
+    <div class="container">
+      <div class="section-head">
+        <h2>Built for trust, not just speed</h2>
+      </div>
+      <div class="grid-3">
+        <div class="feature-card">
+          <div class="feature-icon">🪪</div>
+          <h3>Verified drivers</h3>
+          <p>Every driver is KYC-checked — photo, plate number, and license verified before they can carry a rider.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">₦</div>
+          <h3>Upfront, fair pricing</h3>
+          <p>See your fare before you request. No roadside haggling, no surprise charges.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💳</div>
+          <h3>Wallet or cash</h3>
+          <p>Fund your TRY wallet for fast, cashless trips — or pay your driver directly in cash. Your call.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="drivers">
+    <div class="container">
+      <div class="audience-grid">
+        <div class="audience-card rider">
+          <h3>Riding with TRY</h3>
+          <ul>
+            <li>Request a trip and get matched in minutes</li>
+            <li>See your driver's photo and plate before they arrive</li>
+            <li>Pay by wallet or cash</li>
+            <li>Full trip history, every time</li>
+          </ul>
+          <button class="btn btn-primary" onclick="selectRole('rider')">Join as a rider</button>
+        </div>
+        <div class="audience-card driver">
+          <h3>Earning with TRY</h3>
+          <ul>
+            <li>Keep 90% of every fare — just a 10% commission, no hidden fees</li>
+            <li>Get paid to your TRY wallet the moment a trip completes</li>
+            <li>Withdraw to your bank account anytime</li>
+            <li>Choose your own hours — go online when it suits you</li>
+          </ul>
+          <button class="btn btn-primary" onclick="selectRole('driver')">Join as a driver</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="waitlist" class="alt">
+    <div class="container">
+      <div class="section-head">
+        <h2>Be first in line</h2>
+        <p>We're launching in Onitsha first. Join the waitlist and we'll notify you the moment TRY is live.</p>
+      </div>
+      <form class="waitlist-card" id="waitlist-form">
+        <div class="role-toggle">
+          <button type="button" id="role-rider" class="active" onclick="selectRole('rider')">I want to ride</button>
+          <button type="button" id="role-driver" onclick="selectRole('driver')">I want to drive</button>
+        </div>
+        <label class="field-label" for="phone">Phone number</label>
+        <input type="tel" id="phone" name="phone" placeholder="e.g. 08012345678" required />
+        <button type="submit" class="btn btn-primary">Join the waitlist</button>
+        <div id="form-message" class="form-message"></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="container">
+      <div class="section-head">
+        <h2>Frequently asked questions</h2>
+      </div>
+      <div style="max-width: 640px; margin: 0 auto;">
+        <div class="faq-item">
+          <h3>When is TRY launching?</h3>
+          <p>We're launching first in Onitsha, with plans to expand across Anambra State and then nationwide. Join the waitlist and we'll text you the moment it's live in your area.</p>
+        </div>
+        <div class="faq-item">
+          <h3>Is it safe?</h3>
+          <p>Every driver goes through identity verification (NIN, license, plate number) before they're approved to carry riders. You'll always see your driver's photo and plate before a trip starts.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How do I pay?</h3>
+          <p>Fund your in-app wallet for cashless trips, or pay your driver directly in cash — whichever you prefer.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How much does TRY take from drivers?</h3>
+          <p>A flat 10% commission per completed trip — no hidden charges, no surge pricing games.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <span>© <span id="year"></span> Novapath Technologies Limited. All rights reserved.</span>
+      <div class="footer-links">
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms of Service</a>
+        <a href="https://novapath.ng">Novapath</a>
+        <a href="mailto:info@novapath.ng">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -4,9 +4,10 @@ import { UsersModule } from '../users/users.module';
 import { TripsModule } from '../trips/trips.module';
 import { WalletModule } from '../wallet/wallet.module';
 import { AdminAuthModule } from '../admin-auth/admin-auth.module';
+import { WaitlistModule } from '../waitlist/waitlist.module';
 
 @Module({
-  imports: [UsersModule, TripsModule, WalletModule, AdminAuthModule],
+  imports: [UsersModule, TripsModule, WalletModule, AdminAuthModule, WaitlistModule],
   controllers: [AdminController],
 })
 export class AdminModule {}

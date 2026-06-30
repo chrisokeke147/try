@@ -5,6 +5,7 @@ import { TripsService } from '../trips/trips.service';
 import { TripStatus } from '../trips/entities/trip.entity';
 import { WalletService } from '../wallet/wallet.service';
 import { AdminJwtGuard } from '../admin-auth/admin-jwt.guard';
+import { WaitlistService } from '../waitlist/waitlist.service';
 
 // Backs the admin dashboard: driver approval, live trip monitoring, ledger review.
 // Kept as a thin facade over existing module services rather than duplicating logic.
@@ -16,6 +17,7 @@ export class AdminController {
     private readonly usersService: UsersService,
     private readonly tripsService: TripsService,
     private readonly walletService: WalletService,
+    private readonly waitlistService: WaitlistService,
   ) {}
 
   @Get('drivers')
@@ -74,6 +76,15 @@ export class AdminController {
   async ledgerSummary() {
     const commissionAllTime = await this.tripsService.commissionAllTime();
     return { commissionAllTime };
+  }
+
+  // Pre-launch lead capture from the tryride.ng marketing site — see
+  // WaitlistModule. Counts first since that's the number that matters for a
+  // "how much demand do we have" glance.
+  @Get('waitlist')
+  async listWaitlist() {
+    const [counts, entries] = await Promise.all([this.waitlistService.counts(), this.waitlistService.list()]);
+    return { counts, entries };
   }
 
   @Get('ledger')

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Novapath Technologies Limited</title>
+  <meta name="description" content="Novapath Technologies Limited builds mobility technology for emerging markets, starting with TRY — a tricycle ride-hailing platform launching in Onitsha, Nigeria." />
+  <link rel="icon" href="assets/favicon.png" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="/" class="brand">
+        <img src="assets/logo-mark-white.png" alt="Novapath" style="border-radius: 6px;" />
+        Novapath
+      </a>
+      <nav class="site-nav">
+        <a href="#about">About</a>
+        <a href="#products">Products</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a href="https://tryride.ng" class="btn btn-primary" style="padding: 10px 20px; font-size: 14px;">Visit TRY</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <span class="eyebrow">Lagos, Nigeria</span>
+      <h1>Building mobility technology<br /><span class="accent">for emerging markets.</span></h1>
+      <p class="subhead">
+        Novapath Technologies Limited designs and operates technology platforms that
+        solve everyday transport problems in underserved markets — starting with tricycles in Onitsha.
+      </p>
+      <div class="hero-ctas">
+        <a href="https://tryride.ng" class="btn btn-primary">See our first product, TRY</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="container">
+      <div class="section-head">
+        <h2>What we believe</h2>
+        <p>Local transport problems need locally-built solutions — not a copy-paste of what works in Lagos traffic dropped into a smaller city's reality.</p>
+      </div>
+      <div class="grid-3">
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Start narrow, earn trust</h3>
+          <p>We launch in one city, get the product right with real drivers and riders, then expand — not the other way around.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚙️</div>
+          <h3>Built for the network you have</h3>
+          <p>Our products are designed for real-world Nigerian connectivity and devices, not best-case conditions.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🤝</div>
+          <h3>Asset-light, driver-first</h3>
+          <p>We don't own vehicles or employ drivers — we build the technology that lets independent operators earn more, transparently.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="products" class="alt">
+    <div class="container">
+      <div class="section-head">
+        <h2>Our products</h2>
+      </div>
+      <div class="audience-grid" style="grid-template-columns: 1fr;">
+        <div class="audience-card driver" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+          <div>
+            <h3>TRY</h3>
+            <p style="margin: 0; max-width: 480px;">A tricycle (Keke) ride-hailing platform launching first in Onitsha, Anambra State — verified drivers, upfront fares, wallet or cash payment.</p>
+          </div>
+          <a href="https://tryride.ng" class="btn btn-primary">Visit tryride.ng →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="container">
+      <div class="section-head">
+        <h2>Get in touch</h2>
+        <p>Investors, partners, press, or drivers/riders with questions — we'd like to hear from you.</p>
+      </div>
+      <div style="text-align: center;">
+        <a href="mailto:info@novapath.ng" class="btn btn-primary">info@novapath.ng</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-row">
+      <span>© <span id="year"></span> Novapath Technologies Limited. All rights reserved.</span>
+      <div class="footer-links">
+        <a href="https://tryride.ng/privacy.html">Privacy Policy</a>
+        <a href="https://tryride.ng/terms.html">Terms of Service</a>
+        <a href="https://tryride.ng">TRY</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

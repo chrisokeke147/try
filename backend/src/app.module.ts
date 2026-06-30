@@ -16,6 +16,7 @@ import { PlacesModule } from './modules/places/places.module';
 import { OtpModule } from './modules/otp/otp.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdminAuthModule } from './modules/admin-auth/admin-auth.module';
+import { WaitlistModule } from './modules/waitlist/waitlist.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { AdminAuthModule } from './modules/admin-auth/admin-auth.module';
     OtpModule,
     AuthModule,
     AdminAuthModule,
+    WaitlistModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
