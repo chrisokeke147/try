@@ -15,3 +15,9 @@ android/.gradle/
 android/app/build/
 *.sqlite
 *.tar.gz
+
+# Local Claude Code permission allowlist — accumulates literal command strings
+# (including secrets pasted into curl/test commands) and is per-machine by
+# convention; never commit it. .claude/settings.json (no .local) is the
+# shared/checked-in config and stays tracked.
+.claude/settings.local.json
