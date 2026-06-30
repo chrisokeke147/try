@@ -23,6 +23,13 @@ export class AdminController {
     return this.usersService.listDrivers(status);
   }
 
+  // Backs the dashboard's "find this account" search for support/dispute
+  // resolution — by phone number since that's what a complaining user gives.
+  @Get('users')
+  async searchUsers(@Query('phone') phone?: string) {
+    return phone ? this.usersService.findAllByPhone(phone) : [];
+  }
+
   @Patch('drivers/:id/approve')
   approveDriver(@Param('id') id: string) {
     return this.usersService.setKycStatus(id, DriverKycStatus.APPROVED);
@@ -31,6 +38,19 @@ export class AdminController {
   @Patch('drivers/:id/reject')
   rejectDriver(@Param('id') id: string) {
     return this.usersService.setKycStatus(id, DriverKycStatus.REJECTED);
+  }
+
+  // Applies to either role (rider or driver) — admin kill-switch for abusive
+  // or disputed accounts. Enforced at sign-in and on every trip action (see
+  // UserJwtGuard), not just sign-in, since sessions are long-lived (90d).
+  @Patch('users/:id/suspend')
+  suspendUser(@Param('id') id: string) {
+    return this.usersService.setSuspended(id, true);
+  }
+
+  @Patch('users/:id/unsuspend')
+  unsuspendUser(@Param('id') id: string) {
+    return this.usersService.setSuspended(id, false);
   }
 
   @Get('trips')

@@ -1,9 +1,8 @@
-import { IsLatitude, IsLongitude, IsString, IsUUID } from 'class-validator';
+import { IsLatitude, IsLongitude } from 'class-validator';
 
+// driverId no longer accepted from the client — derived from the
+// authenticated JWT (see UserJwtGuard) in DispatchController.
 export class DriverOnlineDto {
-  @IsUUID()
-  driverId: string;
-
   @IsLatitude()
   lat: number;
 
@@ -11,15 +10,7 @@ export class DriverOnlineDto {
   lng: number;
 }
 
-export class DriverOfflineDto {
-  @IsUUID()
-  driverId: string;
-}
-
 export class DriverLocationDto {
-  @IsUUID()
-  driverId: string;
-
   @IsLatitude()
   lat: number;
 

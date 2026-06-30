@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { JwtService } from '@nestjs/jwt';
 import type { Server, Socket } from 'socket.io';
 
 export interface TripOfferPayload {
@@ -29,6 +30,8 @@ export class DispatchGateway implements OnGatewayConnection, OnGatewayDisconnect
   private readonly logger = new Logger(DispatchGateway.name);
   private readonly socketsByUserId = new Map<string, Socket>();
 
+  constructor(private readonly jwtService: JwtService) {}
+
   handleConnection(client: Socket) {
     this.logger.log(`Socket connected: ${client.id}`);
   }
@@ -43,25 +46,45 @@ export class DispatchGateway implements OnGatewayConnection, OnGatewayDisconnect
     }
   }
 
+  // Verifies the same user JWT issued at signin/signup (see AuthController) —
+  // previously these handlers trusted a raw userId/driverId in the payload,
+  // letting anyone register as any other user's socket and snoop their trip
+  // events. Returns the verified id, or undefined if the token is missing/invalid.
+  private async verify(token: string | undefined): Promise<string | undefined> {
+    if (!token) return undefined;
+    try {
+      const payload = await this.jwtService.verifyAsync(token);
+      return payload.sub;
+    } catch {
+      return undefined;
+    }
+  }
+
   // Generic registration for riders (always-on while the app is open).
   @SubscribeMessage('register')
-  handleRegister(client: Socket, payload: { userId: string }) {
-    this.socketsByUserId.set(payload.userId, client);
-    this.logger.log(`User ${payload.userId} registered`);
+  async handleRegister(client: Socket, payload: { token: string }) {
+    const userId = await this.verify(payload.token);
+    if (!userId) return;
+    this.socketsByUserId.set(userId, client);
+    this.logger.log(`User ${userId} registered`);
   }
 
   // Drivers register only while toggled online — kept as a distinct event
   // name so the driver app's online/offline intent stays explicit, even
   // though it writes to the same underlying map as `register`.
   @SubscribeMessage('driver:online')
-  handleDriverOnline(client: Socket, payload: { driverId: string }) {
-    this.socketsByUserId.set(payload.driverId, client);
-    this.logger.log(`Driver ${payload.driverId} registered for trip offers`);
+  async handleDriverOnline(client: Socket, payload: { token: string }) {
+    const driverId = await this.verify(payload.token);
+    if (!driverId) return;
+    this.socketsByUserId.set(driverId, client);
+    this.logger.log(`Driver ${driverId} registered for trip offers`);
   }
 
   @SubscribeMessage('driver:offline')
-  handleDriverOffline(_client: Socket, payload: { driverId: string }) {
-    this.socketsByUserId.delete(payload.driverId);
+  async handleDriverOffline(_client: Socket, payload: { token: string }) {
+    const driverId = await this.verify(payload.token);
+    if (!driverId) return;
+    this.socketsByUserId.delete(driverId);
   }
 
   /** Returns the number of drivers an offer was actually delivered to. */

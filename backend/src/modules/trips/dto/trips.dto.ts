@@ -1,4 +1,4 @@
-import { IsEnum, IsLatitude, IsLongitude, IsNumber, IsPositive, IsUUID } from 'class-validator';
+import { IsEnum, IsLatitude, IsLongitude, IsNumber, IsPositive } from 'class-validator';
 import { PaymentMethod } from '../entities/trip.entity';
 
 export class FareEstimateDto {
@@ -15,10 +15,9 @@ export class FareEstimateDto {
   dropoffLng: number;
 }
 
+// riderId is no longer accepted from the client — TripsController derives it
+// from the authenticated JWT (see UserJwtGuard) and merges it in.
 export class RequestTripDto {
-  @IsUUID()
-  riderId: string;
-
   @IsEnum(PaymentMethod)
   paymentMethod: PaymentMethod;
 
@@ -37,11 +36,6 @@ export class RequestTripDto {
   @IsNumber()
   @IsPositive()
   estimatedFare: number;
-}
-
-export class AcceptTripDto {
-  @IsUUID()
-  driverId: string;
 }
 
 export class CompleteTripDto {

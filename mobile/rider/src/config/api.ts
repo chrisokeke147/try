@@ -6,3 +6,9 @@ export const API_BASE_URL = 'https://api.tryride.ng';
 export const API_HEADERS = {
   'Content-Type': 'application/json',
 };
+
+// Merges the session token into headers — every authenticated endpoint now
+// requires it (see backend UserJwtGuard). Pass the token from useAuth().
+export function authHeaders(token: string | null) {
+  return { ...API_HEADERS, ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+}

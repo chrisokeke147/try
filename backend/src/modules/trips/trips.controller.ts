@@ -1,8 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { TripsService } from './trips.service';
 import { UsersService } from '../users/users.service';
-import { FareEstimateDto, RequestTripDto, AcceptTripDto, CompleteTripDto } from './dto/trips.dto';
+import { UserJwtGuard } from '../auth/user-jwt.guard';
+import { CurrentUser } from '../auth/current-user.decorator';
+import type { AuthenticatedUser } from '../auth/user-jwt.guard';
+import { FareEstimateDto, RequestTripDto, CompleteTripDto } from './dto/trips.dto';
 
+@UseGuards(UserJwtGuard)
 @Controller('trips')
 export class TripsController {
   constructor(
@@ -11,8 +15,8 @@ export class TripsController {
   ) {}
 
   @Get()
-  async listForUser(@Query('userId') userId: string) {
-    const trips = await this.tripsService.listTripsForUser(userId);
+  async listForUser(@CurrentUser() user: AuthenticatedUser) {
+    const trips = await this.tripsService.listTripsForUser(user.id);
 
     // Enrich with the driver's plate number for display — riders care about
     // recognizing which Keke they rode, not raw driverId UUIDs.
@@ -35,27 +39,27 @@ export class TripsController {
   }
 
   @Post()
-  requestTrip(@Body() body: RequestTripDto) {
-    return this.tripsService.requestTrip(body);
+  requestTrip(@CurrentUser() user: AuthenticatedUser, @Body() body: RequestTripDto) {
+    return this.tripsService.requestTrip({ ...body, riderId: user.id });
   }
 
   @Post(':id/accept')
-  acceptTrip(@Param('id') id: string, @Body() body: AcceptTripDto) {
-    return this.tripsService.acceptTrip(id, body.driverId);
+  acceptTrip(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.tripsService.acceptTrip(id, user.id);
   }
 
   @Post(':id/start')
-  startTrip(@Param('id') id: string) {
-    return this.tripsService.startTrip(id);
+  startTrip(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.tripsService.startTrip(id, user.id);
   }
 
   @Post(':id/complete')
-  completeTrip(@Param('id') id: string, @Body() body: CompleteTripDto) {
-    return this.tripsService.completeTrip(id, body.finalFare);
+  completeTrip(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser, @Body() body: CompleteTripDto) {
+    return this.tripsService.completeTrip(id, user.id, body.finalFare);
   }
 
   @Post(':id/cancel')
-  cancelTrip(@Param('id') id: string) {
-    return this.tripsService.cancelTrip(id);
+  cancelTrip(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.tripsService.cancelTrip(id, user.id);
   }
 }

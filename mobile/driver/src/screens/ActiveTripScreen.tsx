@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { colors, radii, spacing, typography } from '../theme';
 import { Button } from '../components/Button';
-import { API_BASE_URL, API_HEADERS } from '../config/api';
+import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL, authHeaders } from '../config/api';
 
 interface TripOffer {
   tripId: string;
@@ -18,13 +19,14 @@ type TripPhase = 'enroute' | 'in_progress';
 
 export function ActiveTripScreen({ navigation, route }: any) {
   const { offer } = route.params as { offer: TripOffer };
+  const { token } = useAuth();
   const [phase, setPhase] = useState<TripPhase>('enroute');
   const [submitting, setSubmitting] = useState(false);
 
   const startTrip = async () => {
     setSubmitting(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/trips/${offer.tripId}/start`, { method: 'POST', headers: API_HEADERS });
+      const res = await fetch(`${API_BASE_URL}/trips/${offer.tripId}/start`, { method: 'POST', headers: authHeaders(token) });
       if (!res.ok) throw new Error('Could not start trip');
       setPhase('in_progress');
     } catch {
@@ -41,7 +43,7 @@ export function ActiveTripScreen({ navigation, route }: any) {
       // always settling at the original estimate.
       const res = await fetch(`${API_BASE_URL}/trips/${offer.tripId}/complete`, {
         method: 'POST',
-        headers: API_HEADERS,
+        headers: authHeaders(token),
         body: JSON.stringify({ finalFare: offer.estimatedFare }),
       });
       if (!res.ok) throw new Error('Could not complete trip');
@@ -55,7 +57,7 @@ export function ActiveTripScreen({ navigation, route }: any) {
 
   const cancelTrip = async () => {
     try {
-      await fetch(`${API_BASE_URL}/trips/${offer.tripId}/cancel`, { method: 'POST', headers: API_HEADERS });
+      await fetch(`${API_BASE_URL}/trips/${offer.tripId}/cancel`, { method: 'POST', headers: authHeaders(token) });
       navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
     } catch {
       Alert.alert('Could not cancel trip', 'Please check your connection and try again.');

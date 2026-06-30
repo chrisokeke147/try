@@ -7,6 +7,9 @@ export enum LedgerEntryType {
   COMMISSION_DEBIT = 'commission_debit',
   COMMISSION_CREDIT_TRY = 'commission_credit_try',
   DRIVER_WITHDRAWAL = 'driver_withdrawal',
+  // Credits a withdrawal amount back when Monnify reports the disbursement
+  // failed after we'd already debited the wallet at request time.
+  WITHDRAWAL_REVERSED = 'withdrawal_reversed',
 }
 
 // Double-entry style ledger: every wallet balance change is an append-only row here.

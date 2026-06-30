@@ -5,6 +5,7 @@ import { useAdminAuth } from '../context/AdminAuthContext';
 const NAV_ITEMS = [
   { to: '/', label: 'Live Trips', emoji: '🗺️' },
   { to: '/drivers', label: 'Driver Approvals', emoji: '🛺' },
+  { to: '/users', label: 'Users', emoji: '👤' },
   { to: '/ledger', label: 'Wallet & Ledger', emoji: '💳' },
 ];
 

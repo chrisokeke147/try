@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors, radii, spacing, typography } from '../theme';
 import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, authHeaders } from '../config/api';
 
 interface Props {
   navigation: any;
@@ -14,7 +14,7 @@ interface Props {
 // conflicting layout constraints that Android resolved differently than web,
 // pushing the menu half off-screen.
 export function ProfileMenu({ navigation }: Props) {
-  const { user, signOut } = useAuth();
+  const { user, token, signOut } = useAuth();
   const [open, setOpen] = useState(false);
   const firstName = user?.fullName?.split(' ')[0] ?? 'there';
   const initial = firstName.charAt(0).toUpperCase();
@@ -38,7 +38,7 @@ export function ProfileMenu({ navigation }: Props) {
           onPress: async () => {
             if (!user) return;
             try {
-              await fetch(`${API_BASE_URL}/users/${user.id}`, { method: 'DELETE' });
+              await fetch(`${API_BASE_URL}/users/me`, { method: 'DELETE', headers: authHeaders(token) });
             } finally {
               signOut();
               navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });

@@ -3,8 +3,9 @@ import { Alert, Image, Linking, StyleSheet, Text, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE } from '../components/Map';
 import { colors, radii, spacing, typography } from '../theme';
 import { Button } from '../components/Button';
+import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
-import { API_BASE_URL, API_HEADERS } from '../config/api';
+import { API_BASE_URL, authHeaders } from '../config/api';
 
 // Shape returned by POST /trips/:id/accept — driverProfile is the trimmed public
 // profile the backend exposes the instant a driver accepts (see backend
@@ -22,6 +23,7 @@ type TripStatus = 'matched' | 'in_progress' | 'completed' | 'cancelled';
 
 export function DriverMatchedScreen({ navigation, route }: any) {
   const { tripId, driverProfile } = route.params as { tripId: string; driverProfile: DriverProfile | null };
+  const { token } = useAuth();
   const socket = useSocket();
   const [status, setStatus] = useState<TripStatus>('matched');
 
@@ -60,7 +62,7 @@ export function DriverMatchedScreen({ navigation, route }: any) {
 
   const cancelTrip = async () => {
     try {
-      await fetch(`${API_BASE_URL}/trips/${tripId}/cancel`, { method: 'POST', headers: API_HEADERS });
+      await fetch(`${API_BASE_URL}/trips/${tripId}/cancel`, { method: 'POST', headers: authHeaders(token) });
       navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
     } catch {
       Alert.alert('Could not cancel trip', 'Please check your connection and try again.');

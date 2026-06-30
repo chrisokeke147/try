@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { Wallet } from './entities/wallet.entity';
 import { LedgerEntry, LedgerEntryType } from './entities/ledger-entry.entity';
 
@@ -32,21 +32,32 @@ export class WalletService {
   /**
    * Posts one or more ledger entries for the same wallet atomically and updates the
    * cached balance. This is the only method allowed to mutate Wallet.balance.
+   *
+   * Pass an existing `manager` to compose this into a caller's own transaction
+   * (e.g. trip settlement, which posts to two wallets and updates the trip
+   * row in one all-or-nothing unit — see TripsService.completeTrip) instead
+   * of opening a separate transaction per wallet post.
    */
-  async post(walletId: string, entries: Array<{ type: LedgerEntryType; amount: number; tripId?: string; externalReference?: string }>) {
-    return this.dataSource.transaction(async (manager) => {
-      const wallet = await manager.findOne(Wallet, { where: { id: walletId } });
+  async post(
+    walletId: string,
+    entries: Array<{ type: LedgerEntryType; amount: number; tripId?: string; externalReference?: string }>,
+    manager?: EntityManager,
+  ) {
+    const run = async (txManager: EntityManager) => {
+      const wallet = await txManager.findOne(Wallet, { where: { id: walletId } });
       if (!wallet) throw new BadRequestException('Wallet not found');
 
       let runningBalance = wallet.balance;
       for (const entry of entries) {
         runningBalance += entry.amount;
-        await manager.save(LedgerEntry, manager.create(LedgerEntry, { walletId, ...entry }));
+        await txManager.save(LedgerEntry, txManager.create(LedgerEntry, { walletId, ...entry }));
       }
 
       wallet.balance = runningBalance;
-      return manager.save(Wallet, wallet);
-    });
+      return txManager.save(Wallet, wallet);
+    };
+
+    return manager ? run(manager) : this.dataSource.transaction(run);
   }
 
   history(walletId: string) {
@@ -60,5 +71,9 @@ export class WalletService {
 
   findWalletById(id: string) {
     return this.wallets.findOne({ where: { id } });
+  }
+
+  findLedgerEntryByReference(externalReference: string) {
+    return this.ledger.findOne({ where: { externalReference } });
   }
 }

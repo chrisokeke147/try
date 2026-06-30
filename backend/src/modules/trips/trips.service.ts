@@ -1,6 +1,6 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Trip, PaymentMethod, TripStatus } from './entities/trip.entity';
 import { DispatchService } from '../dispatch/dispatch.service';
 import { DispatchGateway } from '../dispatch/dispatch.gateway';
@@ -17,6 +17,12 @@ const BASE_FARE = 250;
 const PER_KM_RATE = 110;
 const MINIMUM_FARE = 350;
 
+// How far a driver-reported finalFare may drift from the system's own
+// estimatedFare before completeTrip rejects it outright. Bounds the damage a
+// malicious/buggy driver client can do (e.g. finalFare: 1 to dodge
+// commission, or an inflated figure to drain a wallet-paying rider).
+const FARE_DRIFT_TOLERANCE = 0.3;
+
 @Injectable()
 export class TripsService {
   constructor(
@@ -26,6 +32,7 @@ export class TripsService {
     private readonly walletService: WalletService,
     private readonly usersService: UsersService,
     private readonly placesService: PlacesService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async estimateFare(pickup: { lat: number; lng: number }, dropoff: { lat: number; lng: number }) {
@@ -94,8 +101,10 @@ export class TripsService {
     return { trip, driverProfile };
   }
 
-  async startTrip(tripId: string) {
+  async startTrip(tripId: string, callerId: string) {
     const trip = await this.findOrThrow(tripId);
+    if (trip.driverId !== callerId) throw new ForbiddenException('Only the assigned driver can start this trip');
+
     trip.status = TripStatus.IN_PROGRESS;
     await this.trips.save(trip);
     this.dispatchGateway.notifyUser(trip.riderId, 'trip:started', { tripId: trip.id });
@@ -106,42 +115,80 @@ export class TripsService {
    * Trip completion settlement. Wallet trips: fare moves rider -> driver minus
    * commission, in one atomic ledger post. Cash trips: rider pays the driver
    * directly, and only the commission is debited from the driver's wallet.
+   *
+   * Runs as one DB transaction covering both wallet posts and the trip status
+   * update — a crash mid-settlement can't leave a half-paid trip. Ledger
+   * entries carry a deterministic externalReference keyed on tripId, so a
+   * retried completeTrip call (flaky network, duplicate client request) hits
+   * the unique constraint and is treated as "already settled" instead of
+   * double-posting.
    */
-  async completeTrip(tripId: string, finalFare: number) {
+  async completeTrip(tripId: string, callerId: string, finalFare: number) {
     const trip = await this.findOrThrow(tripId);
     if (!trip.driverId) throw new BadRequestException('Trip has no assigned driver');
+    if (trip.driverId !== callerId) throw new ForbiddenException('Only the assigned driver can complete this trip');
+    if (trip.status === TripStatus.COMPLETED) return trip; // already settled — idempotent no-op
+
+    if (trip.estimatedFare) {
+      const min = trip.estimatedFare * (1 - FARE_DRIFT_TOLERANCE);
+      const max = trip.estimatedFare * (1 + FARE_DRIFT_TOLERANCE);
+      if (finalFare < min || finalFare > max) {
+        throw new BadRequestException(`finalFare must be within ${Math.round(FARE_DRIFT_TOLERANCE * 100)}% of the estimated fare`);
+      }
+    }
 
     const commission = Math.round(finalFare * COMMISSION_RATE * 100) / 100;
     const driverEarning = finalFare - commission;
 
-    const driverWallet = await this.walletService.getOrCreateWallet(trip.driverId);
+    try {
+      await this.dataSource.transaction(async (manager) => {
+        const driverWallet = await this.walletService.getOrCreateWallet(trip.driverId!);
 
-    if (trip.paymentMethod === PaymentMethod.WALLET) {
-      const riderWallet = await this.walletService.getOrCreateWallet(trip.riderId);
-      await this.walletService.post(riderWallet.id, [
-        { type: LedgerEntryType.TRIP_FARE_DEBIT, amount: -finalFare, tripId: trip.id },
-      ]);
-      await this.walletService.post(driverWallet.id, [
-        { type: LedgerEntryType.DRIVER_EARNING_CREDIT, amount: driverEarning, tripId: trip.id },
-      ]);
-    } else {
-      // Cash trip: rider already paid the driver in person; TRY only collects its cut.
-      await this.walletService.post(driverWallet.id, [
-        { type: LedgerEntryType.COMMISSION_DEBIT, amount: -commission, tripId: trip.id },
-      ]);
+        if (trip.paymentMethod === PaymentMethod.WALLET) {
+          const riderWallet = await this.walletService.getOrCreateWallet(trip.riderId);
+          await this.walletService.post(
+            riderWallet.id,
+            [{ type: LedgerEntryType.TRIP_FARE_DEBIT, amount: -finalFare, tripId: trip.id, externalReference: `trip_${trip.id}_fare` }],
+            manager,
+          );
+          await this.walletService.post(
+            driverWallet.id,
+            [{ type: LedgerEntryType.DRIVER_EARNING_CREDIT, amount: driverEarning, tripId: trip.id, externalReference: `trip_${trip.id}_earning` }],
+            manager,
+          );
+        } else {
+          // Cash trip: rider already paid the driver in person; TRY only collects its cut.
+          await this.walletService.post(
+            driverWallet.id,
+            [{ type: LedgerEntryType.COMMISSION_DEBIT, amount: -commission, tripId: trip.id, externalReference: `trip_${trip.id}_commission` }],
+            manager,
+          );
+        }
+
+        trip.status = TripStatus.COMPLETED;
+        trip.finalFare = finalFare;
+        trip.commissionAmount = commission;
+        await manager.save(Trip, trip);
+      });
+    } catch (err: any) {
+      // Unique violation on externalReference means this trip was already
+      // settled by a concurrent/retried call — treat as success, not an error.
+      if (err?.code === '23505') return this.findOrThrow(tripId);
+      throw err;
     }
 
-    trip.status = TripStatus.COMPLETED;
-    trip.finalFare = finalFare;
-    trip.commissionAmount = commission;
-    await this.trips.save(trip);
     this.dispatchGateway.notifyUser(trip.riderId, 'trip:completed', { tripId: trip.id, finalFare });
     return trip;
   }
 
-  async cancelTrip(tripId: string) {
+  async cancelTrip(tripId: string, callerId: string) {
     const trip = await this.findOrThrow(tripId);
+    if (trip.riderId !== callerId && trip.driverId !== callerId) {
+      throw new ForbiddenException('Only the rider or assigned driver can cancel this trip');
+    }
+
     trip.status = TripStatus.CANCELLED;
+    trip.cancelledBy = trip.riderId === callerId ? 'rider' : 'driver';
     await this.trips.save(trip);
 
     // Notify whichever side didn't initiate the cancellation — both are

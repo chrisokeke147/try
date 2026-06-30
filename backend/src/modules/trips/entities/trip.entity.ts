@@ -52,6 +52,12 @@ export class Trip {
   @Column('double precision', { nullable: true })
   commissionAmount?: number;
 
+  // Who initiated a cancellation — groundwork for the admin dashboard to
+  // surface cancellation-abuse patterns (see MVP audit) without building any
+  // scoring logic yet, just the raw data to review.
+  @Column({ nullable: true })
+  cancelledBy?: 'rider' | 'driver';
+
   @CreateDateColumn()
   createdAt: Date;
 

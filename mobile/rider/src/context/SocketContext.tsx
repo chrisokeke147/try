@@ -22,7 +22,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
     }
 
     const instance = io(API_BASE_URL, { transports: ['websocket'] });
-    instance.on('connect', () => instance.emit('register', { userId: user.id }));
+    instance.on('connect', () => instance.emit('register', { token: user.accessToken }));
     socketRef.current = instance;
     setSocket(instance);
 

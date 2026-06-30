@@ -6,12 +6,12 @@ import MapView, { PROVIDER_GOOGLE } from '../components/Map';
 import { ProfileMenu } from '../components/ProfileMenu';
 import { colors, radii, spacing, typography } from '../theme';
 import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL, API_HEADERS } from '../config/api';
+import { API_BASE_URL, authHeaders } from '../config/api';
 
 const ONITSHA_REGION = { latitude: 6.1667, longitude: 6.7833, latitudeDelta: 0.05, longitudeDelta: 0.05 };
 
 export function HomeScreen({ navigation }: any) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [online, setOnline] = useState(false);
   const socketRef = useRef<Socket | null>(null);
 
@@ -34,12 +34,12 @@ export function HomeScreen({ navigation }: any) {
 
     await fetch(`${API_BASE_URL}/dispatch/drivers/online`, {
       method: 'POST',
-      headers: API_HEADERS,
-      body: JSON.stringify({ driverId: user.id, lat: position.coords.latitude, lng: position.coords.longitude }),
+      headers: authHeaders(token),
+      body: JSON.stringify({ lat: position.coords.latitude, lng: position.coords.longitude }),
     });
 
     const socket = io(API_BASE_URL, { transports: ['websocket'] });
-    socket.on('connect', () => socket.emit('driver:online', { driverId: user.id }));
+    socket.on('connect', () => socket.emit('driver:online', { token }));
     socket.on('trip:offer', (offer) => {
       navigation.navigate('TripOffer', { offer });
     });
@@ -50,8 +50,7 @@ export function HomeScreen({ navigation }: any) {
     if (!user) return;
     await fetch(`${API_BASE_URL}/dispatch/drivers/offline`, {
       method: 'POST',
-      headers: API_HEADERS,
-      body: JSON.stringify({ driverId: user.id }),
+      headers: authHeaders(token),
     });
     socketRef.current?.disconnect();
     socketRef.current = null;

@@ -6,6 +6,7 @@ export interface RiderUser {
   id: string;
   fullName: string;
   phoneNumber: string;
+  accessToken: string;
 }
 
 type OtpPurpose = 'rider_signup' | 'rider_signin';
@@ -14,6 +15,7 @@ const SESSION_KEY = 'try_rider_session';
 
 interface AuthContextValue {
   user: RiderUser | null;
+  token: string | null;
   initializing: boolean;
   loading: boolean;
   error: string | null;
@@ -108,7 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({ user, initializing, loading, error, requestOtp, verifyAndSignUp, verifyAndSignIn, signOut }),
+    () => ({ user, token: user?.accessToken ?? null, initializing, loading, error, requestOtp, verifyAndSignUp, verifyAndSignIn, signOut }),
     [user, initializing, loading, error],
   );
 

@@ -6,7 +6,7 @@ import { colors, radii, spacing, typography } from '../theme';
 import { Button } from '../components/Button';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
-import { API_BASE_URL, API_HEADERS } from '../config/api';
+import { API_BASE_URL, authHeaders } from '../config/api';
 
 // Default map region centered on Onitsha for the pilot — used until the
 // device's real GPS location resolves.
@@ -25,7 +25,7 @@ interface FareEstimate {
 }
 
 export function RequestTripScreen({ navigation, route }: any) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const socket = useSocket();
   const destination: Destination | undefined = route.params?.destination;
 
@@ -57,7 +57,7 @@ export function RequestTripScreen({ navigation, route }: any) {
     setEstimating(true);
     fetch(`${API_BASE_URL}/trips/fare-estimate`, {
       method: 'POST',
-      headers: API_HEADERS,
+      headers: authHeaders(token),
       body: JSON.stringify({
         pickupLat: pickup.lat,
         pickupLng: pickup.lng,
@@ -77,9 +77,8 @@ export function RequestTripScreen({ navigation, route }: any) {
     try {
       const res = await fetch(`${API_BASE_URL}/trips`, {
         method: 'POST',
-        headers: API_HEADERS,
+        headers: authHeaders(token),
         body: JSON.stringify({
-          riderId: user.id,
           paymentMethod,
           pickupLat: pickup.lat,
           pickupLng: pickup.lng,

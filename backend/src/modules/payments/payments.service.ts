@@ -1,12 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { MonnifyClient } from './monnify.client';
 import { WalletService } from '../wallet/wallet.service';
 import { LedgerEntryType } from '../wallet/entities/ledger-entry.entity';
+import { DispatchGateway } from '../dispatch/dispatch.gateway';
 
 @Injectable()
 export class PaymentsService {
-  constructor(private readonly monnify: MonnifyClient, private readonly walletService: WalletService) {}
+  private readonly logger = new Logger(PaymentsService.name);
+
+  constructor(
+    private readonly monnify: MonnifyClient,
+    private readonly walletService: WalletService,
+    private readonly dispatchGateway: DispatchGateway,
+  ) {}
 
   async initiateTopUp(userId: string, amount: number, customerName: string, customerEmail: string) {
     const reference = `topup_${userId}_${randomUUID()}`;
@@ -47,5 +54,34 @@ export class PaymentsService {
     });
 
     return { reference };
+  }
+
+  /**
+   * Called from the Monnify webhook when a disbursement ultimately fails
+   * after we'd already debited the driver's wallet at request time (see
+   * initiateWithdrawal above). Reverses that debit. Idempotent against
+   * retried webhooks via a deterministic externalReference; looks the
+   * original amount up from our own ledger rather than trusting whatever
+   * amount the webhook payload claims.
+   */
+  async reverseFailedWithdrawal(originalReference: string) {
+    const original = await this.walletService.findLedgerEntryByReference(originalReference);
+    if (!original) {
+      this.logger.warn(`Disbursement-failure webhook for unknown reference ${originalReference} — ignoring`);
+      return { reversed: false };
+    }
+
+    const reversalReference = `${originalReference}_reversed`;
+    const alreadyReversed = await this.walletService.findLedgerEntryByReference(reversalReference);
+    if (alreadyReversed) return { reversed: true }; // already handled — idempotent no-op
+
+    await this.walletService.post(original.walletId, [
+      { type: LedgerEntryType.WITHDRAWAL_REVERSED, amount: -original.amount, externalReference: reversalReference },
+    ]);
+
+    const wallet = await this.walletService.findWalletById(original.walletId);
+    if (wallet) this.dispatchGateway.notifyUser(wallet.userId, 'withdrawal:failed', { reference: originalReference });
+
+    return { reversed: true };
   }
 }

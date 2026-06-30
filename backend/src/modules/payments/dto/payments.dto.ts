@@ -1,9 +1,8 @@
-import { IsEmail, IsNotEmpty, IsNumber, IsPositive, IsString, IsUUID } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumber, IsPositive, IsString } from 'class-validator';
 
+// userId/driverId no longer accepted from the client — both controller
+// actions derive identity from the authenticated JWT (see UserJwtGuard).
 export class TopUpDto {
-  @IsUUID()
-  userId: string;
-
   @IsNumber()
   @IsPositive()
   amount: number;
@@ -17,9 +16,6 @@ export class TopUpDto {
 }
 
 export class WithdrawDto {
-  @IsUUID()
-  driverId: string;
-
   @IsNumber()
   @IsPositive()
   amount: number;

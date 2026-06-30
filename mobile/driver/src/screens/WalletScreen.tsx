@@ -3,7 +3,7 @@ import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Text, View }
 import { colors, radii, spacing, typography } from '../theme';
 import { Button } from '../components/Button';
 import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, authHeaders } from '../config/api';
 
 interface LedgerEntry {
   id: string;
@@ -30,7 +30,7 @@ function formatEntryDate(iso: string) {
 }
 
 export function WalletScreen() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [balance, setBalance] = useState<number | null>(null);
   const [entries, setEntries] = useState<LedgerEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,8 +39,8 @@ export function WalletScreen() {
     if (!user) return;
     setLoading(true);
     Promise.all([
-      fetch(`${API_BASE_URL}/wallet/${user.id}/balance`).then((r) => r.json()),
-      fetch(`${API_BASE_URL}/wallet/${user.id}/history`).then((r) => r.json()),
+      fetch(`${API_BASE_URL}/wallet/me/balance`, { headers: authHeaders(token) }).then((r) => r.json()),
+      fetch(`${API_BASE_URL}/wallet/me/history`, { headers: authHeaders(token) }).then((r) => r.json()),
     ])
       .then(([balanceData, historyData]) => {
         setBalance(balanceData.balance);

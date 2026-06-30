@@ -7,9 +7,10 @@ import { DispatchModule } from '../dispatch/dispatch.module';
 import { WalletModule } from '../wallet/wallet.module';
 import { UsersModule } from '../users/users.module';
 import { PlacesModule } from '../places/places.module';
+import { UserJwtModule } from '../auth/user-jwt.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Trip]), DispatchModule, WalletModule, UsersModule, PlacesModule],
+  imports: [TypeOrmModule.forFeature([Trip]), DispatchModule, WalletModule, UsersModule, PlacesModule, UserJwtModule],
   controllers: [TripsController],
   providers: [TripsService],
   exports: [TripsService],

@@ -4,7 +4,7 @@ import { colors, radii, spacing, typography } from '../theme';
 import { QuickActionCard } from '../components/QuickActionCard';
 import { ProfileMenu } from '../components/ProfileMenu';
 import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, authHeaders } from '../config/api';
 
 interface TripHistoryItem {
   id: string;
@@ -30,14 +30,14 @@ function formatTripDate(iso: string) {
 }
 
 export function HomeScreen({ navigation }: any) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const firstName = user?.fullName?.split(' ')[0] ?? 'there';
   const [trips, setTrips] = useState<TripHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
-    fetch(`${API_BASE_URL}/trips?userId=${user.id}`)
+    fetch(`${API_BASE_URL}/trips`, { headers: authHeaders(token) })
       .then((res) => res.json())
       .then((data) => setTrips(Array.isArray(data) ? data.filter((t) => t.status === 'completed') : []))
       .catch(() => setTrips([]))

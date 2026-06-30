@@ -3,15 +3,15 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { colors, radii, spacing, typography } from '../theme';
 import { Button } from '../components/Button';
 import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL } from '../config/api';
+import { API_BASE_URL, authHeaders } from '../config/api';
 
 export function WalletScreen() {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [balance, setBalance] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    fetch(`${API_BASE_URL}/wallet/${user.id}/balance`)
+    fetch(`${API_BASE_URL}/wallet/me/balance`, { headers: authHeaders(token) })
       .then((res) => res.json())
       .then((data) => setBalance(data.balance))
       .catch(() => setBalance(0));

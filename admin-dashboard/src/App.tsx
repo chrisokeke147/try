@@ -4,6 +4,7 @@ import { LiveTripsPage } from './pages/LiveTripsPage';
 import { DriverApprovalsPage } from './pages/DriverApprovalsPage';
 import { LedgerPage } from './pages/LedgerPage';
 import { LoginPage } from './pages/LoginPage';
+import { UsersPage } from './pages/UsersPage';
 import { AdminAuthProvider, useAdminAuth } from './context/AdminAuthContext';
 import './App.css';
 
@@ -18,6 +19,7 @@ function ProtectedShell() {
         <Routes>
           <Route path="/" element={<LiveTripsPage />} />
           <Route path="/drivers" element={<DriverApprovalsPage />} />
+          <Route path="/users" element={<UsersPage />} />
           <Route path="/ledger" element={<LedgerPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { colors, radii, spacing, typography } from '../theme';
 import { Button } from '../components/Button';
 import { useAuth } from '../context/AuthContext';
-import { API_BASE_URL, API_HEADERS } from '../config/api';
+import { API_BASE_URL, authHeaders } from '../config/api';
 
 const CASH_TRIP_MIN_WALLET_BALANCE = 1000; // Keep in sync with backend WalletService.
 
@@ -18,7 +18,7 @@ interface TripOffer {
 }
 
 export function TripOfferScreen({ navigation, route }: any) {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const offer = route.params.offer as TripOffer;
   const [balance, setBalance] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -26,7 +26,7 @@ export function TripOfferScreen({ navigation, route }: any) {
 
   useEffect(() => {
     if (!user) return;
-    fetch(`${API_BASE_URL}/wallet/${user.id}/balance`)
+    fetch(`${API_BASE_URL}/wallet/me/balance`, { headers: authHeaders(token) })
       .then((res) => res.json())
       .then((data) => setBalance(data.balance))
       .catch(() => setBalance(0));
@@ -42,8 +42,7 @@ export function TripOfferScreen({ navigation, route }: any) {
     try {
       const res = await fetch(`${API_BASE_URL}/trips/${offer.tripId}/accept`, {
         method: 'POST',
-        headers: API_HEADERS,
-        body: JSON.stringify({ driverId: user.id }),
+        headers: authHeaders(token),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message ?? 'Could not accept trip');

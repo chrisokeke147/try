@@ -8,6 +8,7 @@ export interface DriverUser {
   phoneNumber: string;
   tricyclePlateNumber?: string;
   kycStatus?: string;
+  accessToken: string;
 }
 
 type OtpPurpose = 'driver_signup' | 'driver_signin';
@@ -27,6 +28,7 @@ const SESSION_KEY = 'try_driver_session';
 
 interface AuthContextValue {
   user: DriverUser | null;
+  token: string | null;
   initializing: boolean;
   loading: boolean;
   error: string | null;
@@ -125,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({ user, initializing, loading, error, requestOtp, verifyAndSignUp, verifyAndSignIn, signOut }),
+    () => ({ user, token: user?.accessToken ?? null, initializing, loading, error, requestOtp, verifyAndSignUp, verifyAndSignIn, signOut }),
     [user, initializing, loading, error],
   );
 

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DriverKycStatus, User, UserRole } from './entities/user.entity';
@@ -9,6 +9,11 @@ export class UsersService {
 
   findByPhone(phoneNumber: string) {
     return this.users.findOne({ where: { phoneNumber } });
+  }
+
+  /** Both accounts for a phone number (a number can be rider and driver at once) — admin search. */
+  findAllByPhone(phoneNumber: string) {
+    return this.users.find({ where: { phoneNumber } });
   }
 
   /**
@@ -23,8 +28,9 @@ export class UsersService {
 
   /** Sign-in: 404s if no account exists for the phone number. */
   async signInRider(phoneNumber: string) {
-    const rider = await this.findByPhone(phoneNumber);
-    if (!rider || rider.role !== UserRole.RIDER) throw new NotFoundException('No rider account found for this phone number');
+    const rider = await this.users.findOne({ where: { phoneNumber, role: UserRole.RIDER } });
+    if (!rider) throw new NotFoundException('No rider account found for this phone number');
+    if (rider.isSuspended) throw new ForbiddenException('Account suspended — contact support');
     return rider;
   }
 
@@ -52,8 +58,9 @@ export class UsersService {
 
   /** Sign-in: 404s if no driver account exists for the phone number. */
   async signInDriver(phoneNumber: string) {
-    const driver = await this.findByPhone(phoneNumber);
-    if (!driver || driver.role !== UserRole.DRIVER) throw new NotFoundException('No driver account found for this phone number');
+    const driver = await this.users.findOne({ where: { phoneNumber, role: UserRole.DRIVER } });
+    if (!driver) throw new NotFoundException('No driver account found for this phone number');
+    if (driver.isSuspended) throw new ForbiddenException('Account suspended — contact support');
     return driver;
   }
 
@@ -74,6 +81,14 @@ export class UsersService {
     if (!driver) throw new NotFoundException('Driver not found');
     driver.kycStatus = status;
     return this.users.save(driver);
+  }
+
+  /** Admin kill-switch — applies to either role. Checked at sign-in and on every trip action. */
+  async setSuspended(userId: string, isSuspended: boolean) {
+    const user = await this.users.findOne({ where: { id: userId } });
+    if (!user) throw new NotFoundException('User not found');
+    user.isSuspended = isSuspended;
+    return this.users.save(user);
   }
 
   /**

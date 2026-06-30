@@ -57,6 +57,12 @@ export class User {
   @Column({ type: 'simple-enum', enum: DriverKycStatus, default: DriverKycStatus.PENDING, nullable: true })
   kycStatus?: DriverKycStatus;
 
+  // Admin kill-switch for abusive/disputed accounts — checked at sign-in and
+  // on every trip-affecting action (see UserJwtGuard), not just sign-in,
+  // since sessions are long-lived (90d).
+  @Column({ default: false })
+  isSuspended: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
