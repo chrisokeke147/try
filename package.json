@@ -1,0 +1,11 @@
+{
+  "name": "try-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TRY — tricycle ride-hailing platform by Novapath Technologies Limited",
+  "workspaces": [
+    "backend",
+    "admin-dashboard",
+    "packages/*"
+  ]
+}

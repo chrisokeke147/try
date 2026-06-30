@@ -1,0 +1,41 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "admin-dashboard",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "admin-dashboard", "run", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "rider-app",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "mobile/rider", "run", "preview"],
+      "port": 19006
+    },
+    {
+      "name": "driver-app",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "mobile/driver", "run", "preview"],
+      "port": 19007
+    },
+    {
+      "name": "rider-go",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "mobile/rider", "run", "go"],
+      "port": 8081
+    },
+    {
+      "name": "rider-go-tunnel",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "mobile/rider", "run", "go:tunnel"],
+      "port": 8081
+    },
+    {
+      "name": "backend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "backend", "run", "start:dev"],
+      "port": 3000
+    }
+  ]
+}

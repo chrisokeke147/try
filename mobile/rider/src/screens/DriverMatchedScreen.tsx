@@ -1,0 +1,131 @@
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, Linking, StyleSheet, Text, View } from 'react-native';
+import MapView, { PROVIDER_GOOGLE } from '../components/Map';
+import { colors, radii, spacing, typography } from '../theme';
+import { Button } from '../components/Button';
+import { useSocket } from '../context/SocketContext';
+import { API_BASE_URL, API_HEADERS } from '../config/api';
+
+// Shape returned by POST /trips/:id/accept — driverProfile is the trimmed public
+// profile the backend exposes the instant a driver accepts (see backend
+// UsersService.toPublicDriverProfile).
+interface DriverProfile {
+  fullName: string;
+  phoneNumber: string;
+  profilePhotoUrl: string | null;
+  tricyclePlateNumber: string | null;
+}
+
+const ONITSHA_REGION = { latitude: 6.1667, longitude: 6.7833, latitudeDelta: 0.05, longitudeDelta: 0.05 };
+
+type TripStatus = 'matched' | 'in_progress' | 'completed' | 'cancelled';
+
+export function DriverMatchedScreen({ navigation, route }: any) {
+  const { tripId, driverProfile } = route.params as { tripId: string; driverProfile: DriverProfile | null };
+  const socket = useSocket();
+  const [status, setStatus] = useState<TripStatus>('matched');
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const onStarted = (payload: { tripId: string }) => {
+      if (payload.tripId === tripId) setStatus('in_progress');
+    };
+    const onCompleted = (payload: { tripId: string }) => {
+      if (payload.tripId === tripId) {
+        setStatus('completed');
+        Alert.alert('Trip completed', 'Thanks for riding with TRY!', [
+          { text: 'OK', onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Home' }] }) },
+        ]);
+      }
+    };
+    const onCancelled = (payload: { tripId: string }) => {
+      if (payload.tripId === tripId) {
+        setStatus('cancelled');
+        Alert.alert('Trip cancelled', undefined, [
+          { text: 'OK', onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Home' }] }) },
+        ]);
+      }
+    };
+
+    socket.on('trip:started', onStarted);
+    socket.on('trip:completed', onCompleted);
+    socket.on('trip:cancelled', onCancelled);
+    return () => {
+      socket.off('trip:started', onStarted);
+      socket.off('trip:completed', onCompleted);
+      socket.off('trip:cancelled', onCancelled);
+    };
+  }, [socket, tripId]);
+
+  const cancelTrip = async () => {
+    try {
+      await fetch(`${API_BASE_URL}/trips/${tripId}/cancel`, { method: 'POST', headers: API_HEADERS });
+      navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
+    } catch {
+      Alert.alert('Could not cancel trip', 'Please check your connection and try again.');
+    }
+  };
+
+  const statusText =
+    status === 'in_progress' ? 'Trip in progress' : status === 'completed' ? 'Trip completed' : 'Your Keke is on the way';
+
+  return (
+    <View style={styles.screen}>
+      <MapView provider={PROVIDER_GOOGLE} style={styles.map} initialRegion={ONITSHA_REGION} userInterfaceStyle="dark" />
+
+      <View style={styles.card}>
+        <Text style={styles.eta}>{statusText}</Text>
+
+        {driverProfile ? (
+          <View style={styles.driverRow}>
+            {driverProfile.profilePhotoUrl ? (
+              <Image source={{ uri: driverProfile.profilePhotoUrl }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatar} />
+            )}
+            <View style={styles.driverInfo}>
+              <Text style={styles.driverName}>{driverProfile.fullName}</Text>
+              {driverProfile.tricyclePlateNumber ? (
+                <View style={styles.plateBadge}>
+                  <Text style={styles.plateText}>{driverProfile.tricyclePlateNumber}</Text>
+                </View>
+              ) : null}
+            </View>
+            <Button label="Call" onPress={() => Linking.openURL(`tel:${driverProfile.phoneNumber}`)} style={styles.callButton} />
+          </View>
+        ) : null}
+
+        {status === 'matched' || status === 'in_progress' ? (
+          <Button label="Cancel trip" variant="secondary" onPress={cancelTrip} />
+        ) : null}
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.black },
+  map: { flex: 1 },
+  card: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: radii.lg,
+    borderTopRightRadius: radii.lg,
+    padding: spacing.lg,
+    gap: spacing.md,
+  },
+  eta: { color: colors.brandYellow, fontSize: typography.sizes.title, fontFamily: typography.fontFamilySemiBold, textAlign: 'center' },
+  driverRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  avatar: { width: 56, height: 56, borderRadius: radii.pill, backgroundColor: colors.surfaceAlt },
+  driverInfo: { flex: 1, gap: spacing.xs },
+  driverName: { color: colors.textOnDark, fontSize: typography.sizes.title, fontFamily: typography.fontFamilySemiBold },
+  plateBadge: {
+    backgroundColor: colors.brandYellow,
+    borderRadius: radii.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    alignSelf: 'flex-start',
+  },
+  plateText: { color: colors.textPrimary, fontFamily: typography.fontFamilyBold, fontSize: typography.sizes.caption },
+  callButton: { paddingHorizontal: spacing.lg },
+});
