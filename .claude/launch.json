@@ -36,6 +36,18 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "backend", "run", "start:dev"],
       "port": 3000
+    },
+    {
+      "name": "web-tryride",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "web/tryride", "-l", "4321"],
+      "port": 4321
+    },
+    {
+      "name": "web-novapath",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "web/novapath", "-l", "4322"],
+      "port": 4322
     }
   ]
 }

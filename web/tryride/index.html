@@ -26,7 +26,7 @@
   </header>
 
   <section class="hero">
-    <div class="container">
+    <div class="container reveal in-view">
       <span class="eyebrow">Launching first in Onitsha</span>
       <h1>Your Keke,<br /><span class="accent">a few taps away.</span></h1>
       <p class="subhead">
@@ -42,22 +42,22 @@
 
   <section id="how-it-works">
     <div class="container">
-      <div class="section-head">
+      <div class="section-head reveal">
         <h2>How TRY works</h2>
         <p>Three steps, no haggling over fare at the roadside.</p>
       </div>
       <div class="grid-3">
-        <div class="step-card">
+        <div class="step-card reveal">
           <div class="step-number">1</div>
           <h3>Request a ride</h3>
           <p>Drop your pickup and destination. We show you the fare upfront, before you book.</p>
         </div>
-        <div class="step-card">
+        <div class="step-card reveal">
           <div class="step-number">2</div>
           <h3>Get matched</h3>
           <p>The nearest available driver accepts. You see their photo, name, and plate number instantly.</p>
         </div>
-        <div class="step-card">
+        <div class="step-card reveal">
           <div class="step-number">3</div>
           <h3>Ride & pay</h3>
           <p>Track your Keke approaching, take your trip, and pay by TRY wallet or cash — your choice.</p>
@@ -68,21 +68,21 @@
 
   <section class="alt">
     <div class="container">
-      <div class="section-head">
+      <div class="section-head reveal">
         <h2>Built for trust, not just speed</h2>
       </div>
       <div class="grid-3">
-        <div class="feature-card">
+        <div class="feature-card reveal">
           <div class="feature-icon">🪪</div>
           <h3>Verified drivers</h3>
           <p>Every driver is KYC-checked — photo, plate number, and license verified before they can carry a rider.</p>
         </div>
-        <div class="feature-card">
+        <div class="feature-card reveal">
           <div class="feature-icon">₦</div>
           <h3>Upfront, fair pricing</h3>
           <p>See your fare before you request. No roadside haggling, no surprise charges.</p>
         </div>
-        <div class="feature-card">
+        <div class="feature-card reveal">
           <div class="feature-icon">💳</div>
           <h3>Wallet or cash</h3>
           <p>Fund your TRY wallet for fast, cashless trips — or pay your driver directly in cash. Your call.</p>
@@ -94,7 +94,7 @@
   <section id="drivers">
     <div class="container">
       <div class="audience-grid">
-        <div class="audience-card rider">
+        <div class="audience-card rider reveal">
           <h3>Riding with TRY</h3>
           <ul>
             <li>Request a trip and get matched in minutes</li>
@@ -104,7 +104,7 @@
           </ul>
           <button class="btn btn-primary" onclick="selectRole('rider')">Join as a rider</button>
         </div>
-        <div class="audience-card driver">
+        <div class="audience-card driver reveal">
           <h3>Earning with TRY</h3>
           <ul>
             <li>Keep 90% of every fare — just a 10% commission, no hidden fees</li>
@@ -120,11 +120,12 @@
 
   <section id="waitlist" class="alt">
     <div class="container">
-      <div class="section-head">
+      <div class="section-head reveal">
         <h2>Be first in line</h2>
         <p>We're launching in Onitsha first. Join the waitlist and we'll notify you the moment TRY is live.</p>
       </div>
-      <form class="waitlist-card" id="waitlist-form">
+      <div class="waitlist-count" id="waitlist-count"></div>
+      <form class="waitlist-card reveal" id="waitlist-form">
         <div class="role-toggle">
           <button type="button" id="role-rider" class="active" onclick="selectRole('rider')">I want to ride</button>
           <button type="button" id="role-driver" onclick="selectRole('driver')">I want to drive</button>
@@ -139,25 +140,45 @@
 
   <section id="faq">
     <div class="container">
-      <div class="section-head">
+      <div class="section-head reveal">
         <h2>Frequently asked questions</h2>
       </div>
-      <div style="max-width: 640px; margin: 0 auto;">
+      <div style="max-width: 640px; margin: 0 auto;" class="reveal">
         <div class="faq-item">
-          <h3>When is TRY launching?</h3>
-          <p>We're launching first in Onitsha, with plans to expand across Anambra State and then nationwide. Join the waitlist and we'll text you the moment it's live in your area.</p>
+          <button class="faq-question" type="button">
+            <h3>When is TRY launching?</h3>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>We're launching first in Onitsha, with plans to expand across Anambra State and then nationwide. Join the waitlist and we'll text you the moment it's live in your area.</p>
+          </div>
         </div>
         <div class="faq-item">
-          <h3>Is it safe?</h3>
-          <p>Every driver goes through identity verification (NIN, license, plate number) before they're approved to carry riders. You'll always see your driver's photo and plate before a trip starts.</p>
+          <button class="faq-question" type="button">
+            <h3>Is it safe?</h3>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Every driver goes through identity verification (NIN, license, plate number) before they're approved to carry riders. You'll always see your driver's photo and plate before a trip starts.</p>
+          </div>
         </div>
         <div class="faq-item">
-          <h3>How do I pay?</h3>
-          <p>Fund your in-app wallet for cashless trips, or pay your driver directly in cash — whichever you prefer.</p>
+          <button class="faq-question" type="button">
+            <h3>How do I pay?</h3>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Fund your in-app wallet for cashless trips, or pay your driver directly in cash — whichever you prefer.</p>
+          </div>
         </div>
         <div class="faq-item">
-          <h3>How much does TRY take from drivers?</h3>
-          <p>A flat 10% commission per completed trip — no hidden charges, no surge pricing games.</p>
+          <button class="faq-question" type="button">
+            <h3>How much does TRY take from drivers?</h3>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>A flat 10% commission per completed trip — no hidden charges, no surge pricing games.</p>
+          </div>
         </div>
       </div>
     </div>

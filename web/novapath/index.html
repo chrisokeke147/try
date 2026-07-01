@@ -27,7 +27,7 @@
   </header>
 
   <section class="hero">
-    <div class="container">
+    <div class="container reveal in-view">
       <span class="eyebrow">Lagos, Nigeria</span>
       <h1>Building mobility technology<br /><span class="accent">for emerging markets.</span></h1>
       <p class="subhead">
@@ -42,22 +42,22 @@
 
   <section id="about">
     <div class="container">
-      <div class="section-head">
+      <div class="section-head reveal">
         <h2>What we believe</h2>
         <p>Local transport problems need locally-built solutions — not a copy-paste of what works in Lagos traffic dropped into a smaller city's reality.</p>
       </div>
       <div class="grid-3">
-        <div class="feature-card">
+        <div class="feature-card reveal">
           <div class="feature-icon">🎯</div>
           <h3>Start narrow, earn trust</h3>
           <p>We launch in one city, get the product right with real drivers and riders, then expand — not the other way around.</p>
         </div>
-        <div class="feature-card">
+        <div class="feature-card reveal">
           <div class="feature-icon">⚙️</div>
           <h3>Built for the network you have</h3>
           <p>Our products are designed for real-world Nigerian connectivity and devices, not best-case conditions.</p>
         </div>
-        <div class="feature-card">
+        <div class="feature-card reveal">
           <div class="feature-icon">🤝</div>
           <h3>Asset-light, driver-first</h3>
           <p>We don't own vehicles or employ drivers — we build the technology that lets independent operators earn more, transparently.</p>
@@ -68,10 +68,10 @@
 
   <section id="products" class="alt">
     <div class="container">
-      <div class="section-head">
+      <div class="section-head reveal">
         <h2>Our products</h2>
       </div>
-      <div class="audience-grid" style="grid-template-columns: 1fr;">
+      <div class="audience-grid reveal" style="grid-template-columns: 1fr;">
         <div class="audience-card driver" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
           <div>
             <h3>TRY</h3>
@@ -85,11 +85,11 @@
 
   <section id="contact">
     <div class="container">
-      <div class="section-head">
+      <div class="section-head reveal">
         <h2>Get in touch</h2>
         <p>Investors, partners, press, or drivers/riders with questions — we'd like to hear from you.</p>
       </div>
-      <div style="text-align: center;">
+      <div style="text-align: center;" class="reveal">
         <a href="mailto:info@novapath.ng" class="btn btn-primary">info@novapath.ng</a>
       </div>
     </div>
@@ -106,6 +106,21 @@
     </div>
   </footer>
 
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            revealObserver.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.15 },
+    );
+    document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+  </script>
 </body>
 </html>
