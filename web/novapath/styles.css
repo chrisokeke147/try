@@ -61,17 +61,20 @@ header.site-header {
   text-decoration: none;
 }
 
-.brand img { width: 32px; height: 32px; }
+/* Sized by height so both the wide TRY wordmark-mark and the square
+   Novapath icon stay crisp and correctly proportioned. */
+.brand img { height: 30px; width: auto; }
 
 nav.site-nav {
   display: flex;
   gap: 28px;
   font-size: 14px;
-  color: var(--text-muted);
+  font-weight: 500;
+  color: #B8B8B8;
 }
 
 nav.site-nav a { text-decoration: none; }
-nav.site-nav a:hover { color: var(--white); }
+nav.site-nav a:hover { color: var(--yellow); }
 
 /* Buttons */
 .btn {
