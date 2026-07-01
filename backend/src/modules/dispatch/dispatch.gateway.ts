@@ -22,6 +22,16 @@ export interface TripOfferPayload {
  * In-memory map only works for a single backend instance — fine for the
  * pilot on one VPS. Scaling to multiple instances later needs Redis pub/sub
  * (or a Socket.IO Redis adapter) instead of this Map.
+ *
+ * CORS stays wildcard here deliberately, unlike the REST API (see
+ * main.ts): the rider/driver apps are native RN clients, not browser pages,
+ * so they don't reliably send a matching Origin header, and restricting
+ * this would risk silently breaking real-time trip offers with no easy way
+ * to catch it before a device actually hits it. It's an acceptable gap
+ * because the only sensitive action here — registering as a given user —
+ * already requires a valid signed JWT (see verify() below); an attacker
+ * connecting from an arbitrary origin still can't register as, or snoop,
+ * anyone else's socket without a real token for that account.
  */
 @WebSocketGateway({ cors: { origin: '*' } })
 export class DispatchGateway implements OnGatewayConnection, OnGatewayDisconnect {

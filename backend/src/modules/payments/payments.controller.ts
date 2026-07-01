@@ -1,5 +1,5 @@
 import { Body, Controller, ForbiddenException, Headers, Post, UseGuards } from '@nestjs/common';
-import { createHmac } from 'crypto';
+import { createHmac, timingSafeEqual } from 'crypto';
 import { PaymentsService } from './payments.service';
 import { TopUpDto, WithdrawDto } from './dto/payments.dto';
 import { UserJwtGuard } from '../auth/user-jwt.guard';
@@ -45,11 +45,22 @@ export class PaymentsController {
     return { received: true };
   }
 
-  private verifySignature(signature: string, rawBody: unknown) {
+  private verifySignature(signature: string | undefined, rawBody: unknown) {
     const expected = createHmac('sha512', process.env.MONNIFY_SECRET_KEY ?? '')
       .update(JSON.stringify(rawBody))
       .digest('hex');
-    if (signature !== expected) {
+
+    // Constant-time comparison — a plain !== leaks how many leading bytes
+    // matched via response-time differences, letting an attacker forge a
+    // valid signature byte-by-byte over enough requests. Buffers must be
+    // equal length before timingSafeEqual will even compare them, so check
+    // that first (also rejects a missing/malformed header outright).
+    const signatureBuffer = Buffer.from(signature ?? '', 'hex');
+    const expectedBuffer = Buffer.from(expected, 'hex');
+    const valid =
+      signatureBuffer.length === expectedBuffer.length && timingSafeEqual(signatureBuffer, expectedBuffer);
+
+    if (!valid) {
       throw new ForbiddenException('Invalid Monnify webhook signature');
     }
   }
