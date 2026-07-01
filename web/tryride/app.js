@@ -14,6 +14,15 @@ function selectRole(role) {
   document.getElementById('waitlist').scrollIntoView({ behavior: 'smooth' });
 }
 
+// Bound here via addEventListener rather than inline onclick="" attributes —
+// the site's CSP (see infra/docker/nginx.conf) sets script-src 'self' with
+// no 'unsafe-inline', which silently blocks inline event-handler attributes.
+// Every "I want to ride/drive" and "Join as a ..." button carries a
+// data-select-role attribute instead.
+document.querySelectorAll('[data-select-role]').forEach((el) => {
+  el.addEventListener('click', () => selectRole(el.dataset.selectRole));
+});
+
 const form = document.getElementById('waitlist-form');
 const messageEl = document.getElementById('form-message');
 

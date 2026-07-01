@@ -34,8 +34,8 @@
         plate number before they arrive, pay by wallet or cash, and get moving.
       </p>
       <div class="hero-ctas">
-        <button class="btn btn-primary" onclick="selectRole('rider')">I want to ride</button>
-        <button class="btn btn-outline" onclick="selectRole('driver')">I want to drive</button>
+        <button class="btn btn-primary" data-select-role="rider">I want to ride</button>
+        <button class="btn btn-outline" data-select-role="driver">I want to drive</button>
       </div>
     </div>
   </section>
@@ -102,7 +102,7 @@
             <li>Pay by wallet or cash</li>
             <li>Full trip history, every time</li>
           </ul>
-          <button class="btn btn-primary" onclick="selectRole('rider')">Join as a rider</button>
+          <button class="btn btn-primary" data-select-role="rider">Join as a rider</button>
         </div>
         <div class="audience-card driver reveal">
           <h3>Earning with TRY</h3>
@@ -112,7 +112,7 @@
             <li>Withdraw to your bank account anytime</li>
             <li>Choose your own hours — go online when it suits you</li>
           </ul>
-          <button class="btn btn-primary" onclick="selectRole('driver')">Join as a driver</button>
+          <button class="btn btn-primary" data-select-role="driver">Join as a driver</button>
         </div>
       </div>
     </div>
@@ -127,8 +127,8 @@
       <div class="waitlist-count" id="waitlist-count"></div>
       <form class="waitlist-card reveal" id="waitlist-form">
         <div class="role-toggle">
-          <button type="button" id="role-rider" class="active" onclick="selectRole('rider')">I want to ride</button>
-          <button type="button" id="role-driver" onclick="selectRole('driver')">I want to drive</button>
+          <button type="button" id="role-rider" class="active" data-select-role="rider">I want to ride</button>
+          <button type="button" id="role-driver" data-select-role="driver">I want to drive</button>
         </div>
         <label class="field-label" for="phone">Phone number</label>
         <input type="tel" id="phone" name="phone" placeholder="e.g. 08012345678" required />
