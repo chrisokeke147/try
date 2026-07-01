@@ -47,9 +47,9 @@ header.site-header {
 .site-header .container {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding-top: 14px;
-  padding-bottom: 14px;
+  gap: 40px;
+  padding-top: 16px;
+  padding-bottom: 16px;
 }
 
 .brand {
@@ -59,22 +59,38 @@ header.site-header {
   font-weight: 700;
   font-size: 20px;
   text-decoration: none;
+  /* Anchors the brand mark to the left edge and pushes nav + CTA into a
+     single right-aligned group, instead of spreading all three across the
+     full header width (which left the nav links stranded, cramped
+     together, in a lot of empty space). */
+  margin-right: auto;
 }
 
 /* Sized by height so both the wide TRY wordmark-mark and the square
    Novapath icon stay crisp and correctly proportioned. */
-.brand img { height: 30px; width: auto; }
+.brand img { height: 28px; width: auto; }
 
 nav.site-nav {
   display: flex;
-  gap: 28px;
+  align-items: center;
+  gap: 22px;
   font-size: 14px;
   font-weight: 500;
   color: #B8B8B8;
+  white-space: nowrap;
 }
 
-nav.site-nav a { text-decoration: none; }
+nav.site-nav a { text-decoration: none; transition: color 0.15s ease; }
 nav.site-nav a:hover { color: var(--yellow); }
+
+@media (max-width: 760px) {
+  /* No hamburger menu on this lean marketing site — rather than cram nav
+     links, the CTA, and the logo into one row on a phone, drop the links
+     and keep the two things a mobile visitor actually needs: the brand
+     and the one action that matters (join the waitlist / visit TRY). */
+  nav.site-nav { display: none; }
+  .site-header .container { gap: 16px; }
+}
 
 /* Buttons */
 .btn {
