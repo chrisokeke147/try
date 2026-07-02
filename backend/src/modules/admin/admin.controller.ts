@@ -33,7 +33,18 @@ export class AdminController {
   // on an account; an admin decides whether a flag warrants a suspend.
   @Get('fraud-flags')
   async listFraudFlags() {
-    return this.fraudService.list();
+    const flags = await this.fraudService.list();
+
+    // Enrich with phone number — an admin acting on a flag needs to actually
+    // identify and reach the account, not just see a raw userId.
+    const userIds = Array.from(new Set(flags.map((f) => f.userId).filter(Boolean))) as string[];
+    const users = await Promise.all(userIds.map((id) => this.usersService.findById(id)));
+    const phoneById = new Map(users.filter(Boolean).map((u) => [u!.id, u!.phoneNumber]));
+
+    return flags.map((flag) => ({
+      ...flag,
+      userPhone: flag.userId ? phoneById.get(flag.userId) ?? null : null,
+    }));
   }
 
   // Backs the dashboard's "find this account" search for support/dispute

@@ -6,6 +6,7 @@ interface FraudFlag {
   id: string;
   type: 'rapid_cancellations' | 'trip_velocity' | 'short_trip_pattern';
   userId: string | null;
+  userPhone: string | null;
   tripId: string | null;
   reason: string;
   createdAt: string;
@@ -48,6 +49,7 @@ export function FraudFlagsPage() {
           <tr>
             <th>Type</th>
             <th>Reason</th>
+            <th>Phone</th>
             <th>User ID</th>
             <th>Trip ID</th>
             <th>Flagged</th>
@@ -55,12 +57,13 @@ export function FraudFlagsPage() {
         </thead>
         <tbody>
           {!loading && flags.length === 0 && (
-            <tr><td colSpan={5} className="muted">No fraud flags — nothing suspicious detected yet.</td></tr>
+            <tr><td colSpan={6} className="muted">No fraud flags — nothing suspicious detected yet.</td></tr>
           )}
           {flags.map((flag) => (
             <tr key={flag.id}>
               <td>{TYPE_LABEL[flag.type]}</td>
               <td>{flag.reason}</td>
+              <td>{flag.userPhone ?? '—'}</td>
               <td>{flag.userId ?? '—'}</td>
               <td>{flag.tripId ?? '—'}</td>
               <td>{flag.createdAt}</td>
