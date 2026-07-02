@@ -6,6 +6,7 @@ import { TripStatus } from '../trips/entities/trip.entity';
 import { WalletService } from '../wallet/wallet.service';
 import { AdminJwtGuard } from '../admin-auth/admin-jwt.guard';
 import { WaitlistService } from '../waitlist/waitlist.service';
+import { FraudService } from '../fraud/fraud.service';
 
 // Backs the admin dashboard: driver approval, live trip monitoring, ledger review.
 // Kept as a thin facade over existing module services rather than duplicating logic.
@@ -18,11 +19,21 @@ export class AdminController {
     private readonly tripsService: TripsService,
     private readonly walletService: WalletService,
     private readonly waitlistService: WaitlistService,
+    private readonly fraudService: FraudService,
   ) {}
 
   @Get('drivers')
   async listDrivers(@Query('status') status?: DriverKycStatus) {
-    return this.usersService.listDrivers(status);
+    const drivers = await this.usersService.listDrivers(status);
+    const ratings = await Promise.all(drivers.map((d) => this.tripsService.averageRatingForDriver(d.id)));
+    return drivers.map((driver, i) => ({ ...driver, averageRating: ratings[i] }));
+  }
+
+  // Review queue only — see FraudFlag's doc comment. Nothing here auto-acts
+  // on an account; an admin decides whether a flag warrants a suspend.
+  @Get('fraud-flags')
+  async listFraudFlags() {
+    return this.fraudService.list();
   }
 
   // Backs the dashboard's "find this account" search for support/dispute

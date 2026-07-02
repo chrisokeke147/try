@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: '/users', label: 'Users', emoji: '👤' },
   { to: '/ledger', label: 'Wallet & Ledger', emoji: '💳' },
   { to: '/waitlist', label: 'Waitlist', emoji: '📋' },
+  { to: '/fraud-flags', label: 'Fraud Flags', emoji: '🚩' },
 ];
 
 export function Sidebar() {

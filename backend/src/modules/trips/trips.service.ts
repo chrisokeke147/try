@@ -8,6 +8,7 @@ import { WalletService, CASH_TRIP_MIN_WALLET_BALANCE } from '../wallet/wallet.se
 import { UsersService } from '../users/users.service';
 import { LedgerEntryType } from '../wallet/entities/ledger-entry.entity';
 import { PlacesService } from '../places/places.service';
+import { FraudService } from '../fraud/fraud.service';
 
 const COMMISSION_RATE = 0.1; // TRY's 10% take per completed ride.
 
@@ -33,6 +34,7 @@ export class TripsService {
     private readonly usersService: UsersService,
     private readonly placesService: PlacesService,
     private readonly dataSource: DataSource,
+    private readonly fraudService: FraudService,
   ) {}
 
   async estimateFare(pickup: { lat: number; lng: number }, dropoff: { lat: number; lng: number }) {
@@ -178,7 +180,24 @@ export class TripsService {
     }
 
     this.dispatchGateway.notifyUser(trip.riderId, 'trip:completed', { tripId: trip.id, finalFare });
+
+    // Fraud checks run after settlement is already durable — a check
+    // failing (e.g. a Places API hiccup computing distance) must never
+    // block or roll back a trip that already paid out correctly.
+    this.runPostCompletionFraudChecks(trip).catch(() => {});
+
     return trip;
+  }
+
+  private async runPostCompletionFraudChecks(trip: Trip) {
+    const { distanceKm } = await this.placesService.distanceAndDuration(
+      { lat: trip.pickupLat, lng: trip.pickupLng },
+      { lat: trip.dropoffLat, lng: trip.dropoffLng },
+    );
+    await Promise.all([
+      this.fraudService.checkTripVelocity(trip, distanceKm),
+      this.fraudService.checkShortTripPattern(trip),
+    ]);
   }
 
   async cancelTrip(tripId: string, callerId: string) {
@@ -196,7 +215,39 @@ export class TripsService {
     this.dispatchGateway.notifyUser(trip.riderId, 'trip:cancelled', { tripId: trip.id });
     if (trip.driverId) this.dispatchGateway.notifyUser(trip.driverId, 'trip:cancelled', { tripId: trip.id });
 
+    this.fraudService.checkRapidCancellations(callerId).catch(() => {});
+
     return trip;
+  }
+
+  /**
+   * Rider rates the driver after a completed trip — rider→driver only (a
+   * driver rating a rider is out of scope for now, see plan). Upsert: rating
+   * again just overwrites, no "already rated" friction.
+   */
+  async rateTrip(tripId: string, riderId: string, rating: number, comment?: string) {
+    const trip = await this.findOrThrow(tripId);
+    if (trip.riderId !== riderId) throw new ForbiddenException('Only the rider on this trip can rate it');
+    if (trip.status !== TripStatus.COMPLETED) throw new BadRequestException('Trip must be completed before it can be rated');
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      throw new BadRequestException('rating must be an integer from 1 to 5');
+    }
+
+    trip.riderRating = rating;
+    trip.riderComment = comment;
+    await this.trips.save(trip);
+    return trip;
+  }
+
+  /** Null if the driver has no rated trips yet — the admin dashboard shows "—" for that. */
+  async averageRatingForDriver(driverId: string): Promise<number | null> {
+    const result = await this.trips
+      .createQueryBuilder('trip')
+      .select('AVG(trip.riderRating)', 'avg')
+      .where('trip.driverId = :driverId', { driverId })
+      .andWhere('trip.riderRating IS NOT NULL')
+      .getRawOne<{ avg: string | null }>();
+    return result?.avg ? Math.round(Number(result.avg) * 10) / 10 : null;
   }
 
   /** Admin trip list, most recent first, optionally filtered by status. */

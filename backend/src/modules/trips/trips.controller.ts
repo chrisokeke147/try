@@ -4,7 +4,7 @@ import { UsersService } from '../users/users.service';
 import { UserJwtGuard } from '../auth/user-jwt.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/user-jwt.guard';
-import { FareEstimateDto, RequestTripDto, CompleteTripDto } from './dto/trips.dto';
+import { FareEstimateDto, RequestTripDto, CompleteTripDto, RateTripDto } from './dto/trips.dto';
 
 @UseGuards(UserJwtGuard)
 @Controller('trips')
@@ -61,5 +61,10 @@ export class TripsController {
   @Post(':id/cancel')
   cancelTrip(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.tripsService.cancelTrip(id, user.id);
+  }
+
+  @Post(':id/rate')
+  rateTrip(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser, @Body() body: RateTripDto) {
+    return this.tripsService.rateTrip(id, user.id, body.rating, body.comment);
   }
 }

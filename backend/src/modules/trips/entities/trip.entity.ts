@@ -58,6 +58,16 @@ export class Trip {
   @Column({ nullable: true })
   cancelledBy?: 'rider' | 'driver';
 
+  // Rider→driver only (see driver rating scope decision) — 1-5, set once the
+  // trip is COMPLETED. Lives on the trip row rather than a join table since
+  // it's strictly 1:1 with a trip. Upsert-friendly: submitting again just
+  // overwrites, no "already rated" error.
+  @Column({ nullable: true })
+  riderRating?: number;
+
+  @Column({ type: 'text', nullable: true })
+  riderComment?: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

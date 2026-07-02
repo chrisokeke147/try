@@ -12,6 +12,7 @@ interface Driver {
   profilePhotoUrl: string;
   tricyclePlatePhotoUrl: string;
   kycStatus: string;
+  averageRating: number | null;
 }
 
 export function DriverApprovalsPage() {
@@ -78,6 +79,7 @@ export function DriverApprovalsPage() {
               <span className="muted">{driver.phoneNumber} · {driver.city}</span>
               <span className="muted">NIN: {driver.nin}</span>
               <span className="plate-badge">{driver.tricyclePlateNumber}</span>
+              <span className="muted">Rating: {driver.averageRating !== null ? `★ ${driver.averageRating}` : '—'}</span>
             </div>
             <img src={driver.tricyclePlatePhotoUrl} alt="Tricycle plate" className="plate-photo" />
             <div className="actions">

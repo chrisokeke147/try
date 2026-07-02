@@ -6,6 +6,7 @@ import { LedgerPage } from './pages/LedgerPage';
 import { LoginPage } from './pages/LoginPage';
 import { UsersPage } from './pages/UsersPage';
 import { WaitlistPage } from './pages/WaitlistPage';
+import { FraudFlagsPage } from './pages/FraudFlagsPage';
 import { AdminAuthProvider, useAdminAuth } from './context/AdminAuthContext';
 import './App.css';
 
@@ -23,6 +24,7 @@ function ProtectedShell() {
           <Route path="/users" element={<UsersPage />} />
           <Route path="/ledger" element={<LedgerPage />} />
           <Route path="/waitlist" element={<WaitlistPage />} />
+          <Route path="/fraud-flags" element={<FraudFlagsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
