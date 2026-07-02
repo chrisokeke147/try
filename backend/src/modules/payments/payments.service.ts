@@ -23,9 +23,21 @@ export class PaymentsService {
 
   /**
    * Called from the Monnify webhook controller once a collection is confirmed.
-   * externalReference makes this idempotent against retried/duplicate webhooks.
+   * externalReference makes this idempotent against retried/duplicate
+   * webhooks — checked proactively here (same pattern as
+   * reverseFailedWithdrawal below) rather than letting a retry hit the DB's
+   * unique constraint and bubble up as an unhandled 500. A caught 500 on a
+   * webhook endpoint just tells the sender "retry me," which for a webhook
+   * that already succeeded is exactly the wrong signal.
    */
   async confirmTopUp(userId: string, amount: number, externalReference: string) {
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new BadRequestException(`confirmTopUp received a non-numeric or non-positive amount: ${amount}`);
+    }
+
+    const existing = await this.walletService.findLedgerEntryByReference(externalReference);
+    if (existing) return { alreadyProcessed: true };
+
     const wallet = await this.walletService.getOrCreateWallet(userId);
     return this.walletService.post(wallet.id, [
       { type: LedgerEntryType.RIDER_TOPUP, amount, externalReference },

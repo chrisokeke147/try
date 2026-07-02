@@ -32,7 +32,12 @@ export class PaymentsController {
       const { amountPaid, transactionReference, paymentReference } = body.eventData;
       // userId is encoded as the prefix of our payment reference (topup_<userId>_<uuid>).
       const userId = paymentReference.split('_')[1];
-      await this.paymentsService.confirmTopUp(userId, amountPaid, transactionReference);
+      // Monnify sends amountPaid as a string (e.g. "1000.00") — this untyped
+      // webhook body is the one place a raw external payload feeds directly
+      // into wallet arithmetic. Without this conversion, `balance += "1000.00"`
+      // is string concatenation, not addition (caught in sandbox testing:
+      // a -1370 balance became -13701000 instead of -370).
+      await this.paymentsService.confirmTopUp(userId, Number(amountPaid), transactionReference);
     }
 
     // Exact event name to confirm against Monnify's disbursement webhook docs

@@ -49,6 +49,14 @@ export class WalletService {
 
       let runningBalance = wallet.balance;
       for (const entry of entries) {
+        // Defense in depth against a repeat of a real bug: a webhook payload
+        // fed an un-coerced string amount straight into `+=` here, silently
+        // turning addition into string concatenation (-1370 + "1000.00"
+        // became -13701000, not -370). Any non-finite amount reaching this
+        // point is a caller bug, not something to silently misprocess.
+        if (typeof entry.amount !== 'number' || !Number.isFinite(entry.amount)) {
+          throw new BadRequestException(`Ledger entry amount must be a finite number, got: ${JSON.stringify(entry.amount)}`);
+        }
         runningBalance += entry.amount;
         await txManager.save(LedgerEntry, txManager.create(LedgerEntry, { walletId, ...entry }));
       }
