@@ -309,7 +309,8 @@ section.alt { background: var(--surface); }
   margin-bottom: 8px;
 }
 
-.waitlist-card input[type="tel"] {
+.waitlist-card input[type="tel"],
+.waitlist-card select {
   width: 100%;
   padding: 14px 16px;
   border-radius: var(--radius-md);
@@ -318,9 +319,11 @@ section.alt { background: var(--surface); }
   color: var(--white);
   font-size: 15px;
   margin-bottom: 16px;
+  font-family: inherit;
 }
 
-.waitlist-card input[type="tel"]:focus {
+.waitlist-card input[type="tel"]:focus,
+.waitlist-card select:focus {
   outline: none;
   border-color: var(--yellow);
 }
@@ -406,6 +409,24 @@ footer.site-footer {
 .footer-links { display: flex; gap: 20px; }
 .footer-links a { text-decoration: none; }
 .footer-links a:hover { color: var(--white); }
+
+.footer-social {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.footer-social a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.footer-social a:hover { color: var(--yellow); border-color: var(--yellow); }
 
 /* Legal pages */
 .legal-page { padding: 56px 0 80px; }

@@ -29,6 +29,7 @@ const messageEl = document.getElementById('form-message');
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   const phone = document.getElementById('phone').value.trim();
+  const city = document.getElementById('city').value;
   const submitBtn = form.querySelector('button[type="submit"]');
 
   messageEl.textContent = '';
@@ -40,7 +41,7 @@ form.addEventListener('submit', async (e) => {
     const res = await fetch(`${API_BASE_URL}/waitlist`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phoneNumber: phone, role: selectedRole }),
+      body: JSON.stringify({ phoneNumber: phone, role: selectedRole, city }),
     });
 
     if (!res.ok) {

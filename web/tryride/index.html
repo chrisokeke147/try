@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TRY — Tricycle rides in Onitsha, on demand</title>
-  <meta name="description" content="TRY is a tricycle (Keke) ride-hailing app launching first in Onitsha. Verified drivers, fair pricing, wallet or cash. Join the early-access waitlist." />
+  <title>TRY — Tricycle rides across Anambra State, on demand</title>
+  <meta name="description" content="TRY is a tricycle (Keke) ride-hailing app launching across Anambra State, expanding nationwide. Verified drivers, fair pricing, wallet or cash. Join the early-access waitlist." />
   <link rel="icon" href="assets/favicon.png" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="styles.css" />
@@ -27,7 +27,7 @@
 
   <section class="hero">
     <div class="container reveal in-view">
-      <span class="eyebrow">Launching first in Onitsha</span>
+      <span class="eyebrow">Piloting across Anambra State</span>
       <h1>Your Keke,<br /><span class="accent">a few taps away.</span></h1>
       <p class="subhead">
         TRY connects you with verified tricycle drivers nearby — see their photo and
@@ -122,7 +122,7 @@
     <div class="container">
       <div class="section-head reveal">
         <h2>Be first in line</h2>
-        <p>We're launching in Onitsha first. Join the waitlist and we'll notify you the moment TRY is live.</p>
+        <p>We're piloting across Anambra State. Join the waitlist and we'll notify you the moment TRY is live in your city.</p>
       </div>
       <div class="waitlist-count" id="waitlist-count"></div>
       <form class="waitlist-card reveal" id="waitlist-form">
@@ -132,6 +132,17 @@
         </div>
         <label class="field-label" for="phone">Phone number</label>
         <input type="tel" id="phone" name="phone" placeholder="e.g. 08012345678" required />
+        <label class="field-label" for="city">Your city</label>
+        <select id="city" name="city">
+          <option value="Onitsha">Onitsha</option>
+          <option value="Awka">Awka</option>
+          <option value="Nnewi">Nnewi</option>
+          <option value="Ekwulobia">Ekwulobia</option>
+          <option value="Ihiala">Ihiala</option>
+          <option value="Aguata">Aguata</option>
+          <option value="Nkpor">Nkpor</option>
+          <option value="Other Anambra town">Other Anambra town</option>
+        </select>
         <button type="submit" class="btn btn-primary">Join the waitlist</button>
         <div id="form-message" class="form-message"></div>
       </form>
@@ -150,7 +161,7 @@
             <span class="faq-icon">+</span>
           </button>
           <div class="faq-answer">
-            <p>We're launching first in Onitsha, with plans to expand across Anambra State and then nationwide. Join the waitlist and we'll text you the moment it's live in your area.</p>
+            <p>We're piloting across Anambra State — Onitsha, Awka, Nnewi, and other towns — with plans to expand nationwide from there. Join the waitlist and we'll text you the moment it's live in your area.</p>
           </div>
         </div>
         <div class="faq-item">
@@ -185,13 +196,38 @@
   </section>
 
   <footer class="site-footer">
-    <div class="container footer-row">
-      <span>© <span id="year"></span> Novapath Technologies Limited. All rights reserved.</span>
-      <div class="footer-links">
-        <a href="/privacy.html">Privacy Policy</a>
-        <a href="/terms.html">Terms of Service</a>
-        <a href="https://novapath.ng">Novapath</a>
-        <a href="mailto:info@novapath.ng">Contact</a>
+    <div class="container">
+      <!--
+        Social handles: accounts aren't created yet, so these intentionally
+        point at "#" for now. Once each account exists, replace the href on
+        the matching <a> below with the real profile URL — nothing else
+        needs to change (icons/labels/aria-labels already correct).
+      -->
+      <div class="footer-social">
+        <a href="#" aria-label="TRY on X (Twitter)" title="Coming soon">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23.3 22H16.7l-5.2-6.8L5.5 22H2.3l8.1-9.3L1.4 2h6.8l4.7 6.2L18.9 2Zm-1.2 18h1.7L7.4 3.9H5.6L17.7 20Z"/></svg>
+        </a>
+        <a href="#" aria-label="TRY on Instagram" title="Coming soon">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.06 2 .25 2.4.42.6.24 1 .53 1.5 1a4 4 0 0 1 1 1.5c.17.4.36 1.2.42 2.4.06 1.3.07 1.7.07 4.9s0 3.6-.07 4.9c-.06 1.2-.25 2-.42 2.4a4 4 0 0 1-1 1.5 4 4 0 0 1-1.5 1c-.4.17-1.2.36-2.4.42-1.3.06-1.7.07-4.9.07s-3.6 0-4.9-.07c-1.2-.06-2-.25-2.4-.42a4 4 0 0 1-1.5-1 4 4 0 0 1-1-1.5c-.17-.4-.36-1.2-.42-2.4C2.2 15.6 2.2 15.2 2.2 12s0-3.6.07-4.9c.06-1.2.25-2 .42-2.4a4 4 0 0 1 1-1.5 4 4 0 0 1 1.5-1c.4-.17 1.2-.36 2.4-.42C8.4 2.2 8.8 2.2 12 2.2Zm0 1.8c-3.15 0-3.52 0-4.76.07-.97.04-1.5.2-1.85.34-.46.18-.8.39-1.15.74-.35.35-.56.69-.74 1.15-.14.35-.3.88-.34 1.85C3.1 8.98 3.1 9.35 3.1 12.5s0 3.52.07 4.76c.04.97.2 1.5.34 1.85.18.46.39.8.74 1.15.35.35.69.56 1.15.74.35.14.88.3 1.85.34 1.24.06 1.61.07 4.76.07s3.52 0 4.76-.07c.97-.04 1.5-.2 1.85-.34.46-.18.8-.39 1.15-.74.35-.35.56-.69.74-1.15.14-.35.3-.88.34-1.85.06-1.24.07-1.61.07-4.76s0-3.52-.07-4.76c-.04-.97-.2-1.5-.34-1.85a3 3 0 0 0-.74-1.15 3 3 0 0 0-1.15-.74c-.35-.14-.88-.3-1.85-.34C15.52 4 15.15 4 12 4Zm0 3.4a4.6 4.6 0 1 1 0 9.2 4.6 4.6 0 0 1 0-9.2Zm0 1.8a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Zm4.8-2a1.08 1.08 0 1 1 0 2.16 1.08 1.08 0 0 1 0-2.16Z"/></svg>
+        </a>
+        <a href="#" aria-label="TRY on Facebook" title="Coming soon">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M14 22v-8.5h2.9l.4-3.4H14V7.8c0-1 .3-1.6 1.7-1.6H17V3.2c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H8.4v3.4h2.4V22h3.2Z"/></svg>
+        </a>
+        <a href="#" aria-label="TRY on TikTok" title="Coming soon">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M16.6 2h-3.2v13.4a2.9 2.9 0 1 1-2.9-2.9c.3 0 .6 0 .9.1V9.4a6.1 6.1 0 0 0-.9-.1A6.1 6.1 0 1 0 16.6 15V8.3a7.5 7.5 0 0 0 4.4 1.4V6.5a4.3 4.3 0 0 1-4.4-4.5Z"/></svg>
+        </a>
+        <a href="#" aria-label="TRY on WhatsApp Channel" title="Coming soon">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.5A10 10 0 1 0 12 2Zm0 1.8a8.2 8.2 0 0 1 6.9 12.6l-.2.3.6 2.4-2.4-.6-.3.2A8.2 8.2 0 1 1 12 3.8Zm-3.4 4.3c-.2 0-.5 0-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.8 4.4 3.8 2.2.9 2.6.7 3.1.6.5 0 1.6-.6 1.8-1.3.2-.6.2-1.2.2-1.3-.1-.1-.3-.2-.6-.3l-1.8-.9c-.2-.1-.4-.1-.6.1l-.7.9c-.1.2-.3.2-.5.1-.7-.3-1.5-.8-2.2-1.5-.6-.6-1-1.2-1.2-1.6-.1-.2 0-.4.1-.5l.4-.5c.1-.2.1-.4 0-.6l-.8-1.9c-.1-.3-.3-.3-.5-.3h-.5Z"/></svg>
+        </a>
+      </div>
+      <div class="footer-row">
+        <span>© <span id="year"></span> Novapath Technologies Limited. All rights reserved.</span>
+        <div class="footer-links">
+          <a href="/privacy.html">Privacy Policy</a>
+          <a href="/terms.html">Terms of Service</a>
+          <a href="https://novapath.ng">Novapath</a>
+          <a href="mailto:info@novapath.ng">Contact</a>
+        </div>
       </div>
     </div>
   </footer>

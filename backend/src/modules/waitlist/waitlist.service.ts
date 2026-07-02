@@ -16,7 +16,7 @@ export class WaitlistService {
   async join(phoneNumber: string, role: WaitlistRole, city?: string) {
     const existing = await this.entries.findOne({ where: { phoneNumber, role } });
     if (existing) return { joined: true };
-    await this.entries.save(this.entries.create({ phoneNumber, role, city: city || 'Onitsha' }));
+    await this.entries.save(this.entries.create({ phoneNumber, role, city: city || 'Anambra State' }));
     return { joined: true };
   }
 

@@ -20,7 +20,10 @@ export class WaitlistEntry {
   @Column({ type: 'simple-enum', enum: WaitlistRole })
   role: WaitlistRole;
 
-  @Column({ default: 'Onitsha' })
+  // The form now collects the visitor's actual city (see JoinWaitlistDto) —
+  // this default only covers old rows/edge cases from before the pilot
+  // expanded to be Anambra-wide rather than Onitsha-first.
+  @Column({ default: 'Anambra State' })
   city: string;
 
   @CreateDateColumn()
